@@ -37,3 +37,4 @@ const testFilter = [
 // stringify then encode the array to be added as the filter param.
 const paramStringFilter = encodeURIComponent(JSON.stringify(testFilter));
 ```
+jsfiddle for ease of testing: https://jsfiddle.net/qbzrpa09/5/
