@@ -63,7 +63,7 @@ const testStringFilter = encodeURIComponent(JSON.stringify(testFilter));
 
 
 // filter param is optional for testing purposes
-app.get('/:formId/filteredResponses/:filter', (req, res) => {
+app.get('/:formId/filteredResponses/:filter?', (req, res) => {
 
 	// variable setup and inital param capture
 	let formId = req.params.formId,
