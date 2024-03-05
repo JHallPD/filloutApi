@@ -20,7 +20,7 @@ https://filloutapi-q1qs.onrender.com/cLZojxk94ous/filteredResponses/%5B%7B%22id%
 
 ## Param encoding
 
-Here is an example of how the above filter param being formated. Make sure the param is not enclosed in a string
+Here is an example of how the above filter param is being formated. Make sure the param is not enclosed in a string
 ```
 const testFilter = [
 	{
