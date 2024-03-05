@@ -64,64 +64,69 @@ const testStringFilter = encodeURIComponent(JSON.stringify(testFilter));
 
 // filter param is optional for testing purposes
 app.get('/:formId/filteredResponses/:filter?', (req, res) => {
+	try{
 
-	// variable setup and inital param capture
-	let formId = req.params.formId,
-		filteredResponses: formResults = {
-		responses: [],
-		totalResponses: 0,
-		pageCount: 1
-	};
-	let filters: ResponsesFiltersType = JSON.parse(decodeURIComponent(req.params.filter !== undefined?req.params.filter:testStringFilter));
-	// Fillout url options
-	const options = {
-		method: 'GET',
-		headers: {
-			'Authorization': "Bearer "+ process.env.FORM_KEY,
-		}
-	};	
-	fetch(`https://api.fillout.com/v1/api/forms/${formId}/submissions`, options)
-	  .then(res => res.json())
-	  .then(json =>  {
-		for (let i = 0; i < json.responses.length; i++) {
-		  let responseCheck = false;
-		  // loop over each responses questions array and determine if it matches the filter criteria. 
-		  json.responses[i].questions.forEach((question: question)=>{
-			// loop over each filter and look for a match
-			filters.forEach((filter)=>{
-			  if(question.id === filter.id){
-				switch(true){
-				  case filter.condition === 'equals':
-					filter.value === question.value ? null:responseCheck=true;
-					break;
-				  case filter.condition === 'does_not_equal':
-					filter.value !== question.value ? null:responseCheck=true;
-					break;
-				  case filter.condition === 'greater_than':
-					filter.value < question.value ? null:responseCheck=true;
-					break;
-				  case filter.condition === 'less_than':
-					filter.value > question.value ? null:responseCheck=true;
-					break;
-				  default:
-					console.error('error:' + "Condition Invalid");
-				}
+		// variable setup and inital param capture
+		let formId = req.params.formId,
+			filteredResponses: formResults = {
+			responses: [],
+			totalResponses: 0,
+			pageCount: 1
+		};
+		let filters: ResponsesFiltersType = JSON.parse(decodeURIComponent(req.params.filter !== undefined?req.params.filter:testStringFilter));
+		// Fillout url options
+		const options = {
+			method: 'GET',
+			headers: {
+				'Authorization': "Bearer "+ process.env.FORM_KEY,
+			}
+		};	
+		fetch(`https://api.fillout.com/v1/api/forms/${formId}/submissions`, options)
+		  .then(res => res.json())
+		  .then(json =>  {
+			for (let i = 0; i < json.responses.length; i++) {
+			  let responseCheck = false;
+			  // loop over each responses questions array and determine if it matches the filter criteria. 
+			  json.responses[i].questions.forEach((question: question)=>{
+				// loop over each filter and look for a match
+				filters.forEach((filter)=>{
+				  if(question.id === filter.id){
+					switch(true){
+					  case filter.condition === 'equals':
+						filter.value === question.value ? null:responseCheck=true;
+						break;
+					  case filter.condition === 'does_not_equal':
+						filter.value !== question.value ? null:responseCheck=true;
+						break;
+					  case filter.condition === 'greater_than':
+						filter.value < question.value ? null:responseCheck=true;
+						break;
+					  case filter.condition === 'less_than':
+						filter.value > question.value ? null:responseCheck=true;
+						break;
+					  default:
+						console.error('error:' + "Condition Invalid");
+					}
+				  }
+				})
+  
+			  })
+			  // if matches for the filter are found they will be added to the return data here
+			  if(!responseCheck){
+				filteredResponses.responses.push(json.responses[i]);
+				filteredResponses.totalResponses += 1;
+  
+				filteredResponses.pageCount = Math.ceil(filteredResponses.totalResponses/20)
 			  }
-			})
-  
-		  })
-		  // if matches for the filter are found they will be added to the return data here
-		  if(!responseCheck){
-			filteredResponses.responses.push(json.responses[i]);
-			filteredResponses.totalResponses += 1;
-  
-			filteredResponses.pageCount = Math.ceil(filteredResponses.totalResponses/20)
-		  }
-		}
-		res.send(filteredResponses);
-	})
-	.catch(err => console.error('error:' + err));
+			}
+			res.send(filteredResponses);
+		})
+		.catch(err => console.error('error:' + err));
 
+	}catch(err){
+		console.log(err)
+		res.status(400).send("error with filter");
+	}
 	
 });
 
